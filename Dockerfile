@@ -10,7 +10,7 @@ RUN apt-get update && \
 # Download and install MariaDB Connector/C
 RUN mkdir /mariadb-connector-c && \
     cd /mariadb-connector-c && \
-    wget https://downloads.mariadb.com/Connectors/c/connector-c-3.3.7/mariadb-connector-c-3.3.7-src.tar.gz && \
+    wget https://downloads.mariadb.com/Connectors/c/connector-c-3.3.2/mariadb-connector-c-3.3.2-src.tar.gz && \
     tar -xzvf mariadb-connector-c-3.3.2-src.tar.gz && \
     cd mariadb-connector-c-3.3.2-src && \
     cmake . && \
