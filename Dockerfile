@@ -35,7 +35,7 @@ COPY . /app
 EXPOSE 80
 
 # Define environment variable
-ENV NAME World
+ENV NAME Flask
 
 # Run app.py when the container launches
 CMD ["gunicorn", "-b", "0.0.0.0:80", "--reload", "main:app"]
