@@ -1,6 +1,9 @@
 # Use an official Python runtime as a parent image
 FROM python:3.10.11
 
+# Set the working directory to /app
+WORKDIR /app
+
 # Install MariaDB Connector/C dependencies and cleanup
 RUN apt-get update && \
     apt-get install -y build-essential cmake libcups2-dev libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-3.0 libdbus-1-dev libdbus-glib-1-dev && \
