@@ -1,1 +1,1 @@
-from .users import UserQuerys
+from .aluno_treino import Querys 

@@ -1,1 +1,2 @@
-from .user import User
+from .models import Aluno, ExerciciosAluno 
+from src.database import Base

@@ -1,61 +1,40 @@
-# pylint: disable=import-outside-toplevel
-"""Aplication Factory"""
+from flask import Flask, current_app
+from flask_login import LoginManager
+from src.database.querys import Querys
+from src.database.config import db, DBConnectionHandler, DevelopmentConfig
+from src.database import Base
+from src.database.models import Aluno
 
-from flask import Flask
+login_manager = LoginManager()
 
+def load_user(user_id):
+    with DBConnectionHandler(current_app.db) as connection:
+        connection = DBConnectionHandler(db)
+        user = connection.query(Aluno).get(int(user_id))
+        return user
 
-def init_app() -> Flask:
-    """init_app é uma fectory que retorna
-    uma instancia da aplcação Flask.
-
-    Para configurar a aplicação deve-se Intanciar
-    o objeto de configuração de acordo com o ambiente.
-
-    O banco de dodos é manipulado através da biblioteca
-    SQLAlchemy. Todos os arquivos para interação com
-    o banco de dados esta em ./src/database/, sendo que
-    dentro desse diretorio existe outras duas pastas essenciais,
-    que são:
-    ../models que contens os models da aplicão e
-    ../querys que contem as interações com o banco de dados
-
-
-    SQLAlchemy - Website: https://www.sqlalchemy.org/
-
-    As Blueprints da apicação estão setadas detro de
-    ./src/blueprints/blueprint_name/. Cada uma
-    possui um url proprio para suas rotas que é
-    setado em url_prefix. Ela pode conter um diretorio
-    src para manter os objetos utilizados pela blueprints
-
-    """
-
+def init_app():
+    """Construindo o app"""
     app = Flask(__name__)
+    app.config.from_object("src.database.config.DevelopmentConfig")
 
-    # Setando configurações da aplicação
-    from .settings import DevelopmentConfig
+    login_manager.init_app(app)
+    login_manager.login_view = 'login_app.login'
+    login_manager.user_loader(load_user)
 
-    app.config.from_object(DevelopmentConfig)
+    # Importar blueprints após a criação do aplicativo
+    from .blueprints import login_app, initial_app, cadastro_app, clientes_app, treino_app
 
-    # Configurando banco de dados
-    from .database import Base, DBConnectionHendler
-
-    db_connection = DBConnectionHendler()
-    engine = db_connection.get_engine()
-
-    # Criando um contexto para a aplicação.
-    # Referencia: https://flask.palletsprojects.com/en/2.1.x/appcontext/
+    # Registrar blueprints
+    app.register_blueprint(login_app)
+    app.register_blueprint(initial_app)
+    app.register_blueprint(cadastro_app)
+    app.register_blueprint(clientes_app)
+    app.register_blueprint(treino_app)
+    db_handler = DBConnectionHandler(db)
+    db_handler.init_app(app)
+    
     with app.app_context():
+        Base.metadata.create_all(db_handler.get_connection().engine)
 
-        # Registrando as Blueprints: https://flask.palletsprojects.com/en/2.1.x/blueprints/
-
-        from .blueprints import auth
-
-        app.register_blueprint(auth)
-
-
-        # Criando tabelas que não existem e estão
-        # presentes na engine.
-        Base.metadata.create_all(engine)
-
-        return app
+    return app, login_manager
