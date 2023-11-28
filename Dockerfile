@@ -32,7 +32,7 @@ RUN echo "default-authentication-plugin = mysql_native_password" >> /etc/mysql/m
 COPY . /app
 
 # Make port 5000 available to the world outside this container
-EXPOSE 5000
+EXPOSE 80
 
 # Define environment variable
 ENV NAME World
